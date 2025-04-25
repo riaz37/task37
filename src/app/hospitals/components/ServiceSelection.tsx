@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Service } from '@/types/hospital';
+import { useEffect, useState } from "react";
+import { Service } from "@/types/hospital";
 
 type Props = {
   hospitalId: string;
@@ -16,17 +16,19 @@ export default function ServiceSelection({
 }: Props) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await fetch(`/api/hospitals/${hospitalId}/services`);
-        if (!response.ok) throw new Error('Failed to fetch services');
+        if (!response.ok) throw new Error("Failed to fetch services");
         const data = await response.json();
         setServices(data);
-      } catch (err) {
-        setError('Failed to load services');
+      } catch (error) {
+        setError(
+          `Failed to load services: ${error instanceof Error ? error.message : String(error)}`
+        );
       } finally {
         setLoading(false);
       }
@@ -46,8 +48,8 @@ export default function ServiceSelection({
           key={service.id}
           className={`p-4 border rounded-lg cursor-pointer transition-colors ${
             selectedService?.id === service.id
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-200 hover:border-blue-300'
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-200 hover:border-blue-300"
           }`}
           onClick={() => onServiceSelect(service)}
         >

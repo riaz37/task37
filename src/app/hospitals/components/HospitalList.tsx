@@ -20,8 +20,8 @@ export default function HospitalList({ selectedHospital, onHospitalSelect }: Pro
         if (!response.ok) throw new Error('Failed to fetch hospitals');
         const data = await response.json();
         setHospitals(data);
-      } catch (err) {
-        setError('Failed to load hospitals');
+      } catch (error) {
+        setError(`Failed to load hospitals: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setLoading(false);
       }
