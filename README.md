@@ -1,65 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MedBook - Healthcare Booking System
+
+A Next.js application for booking medical appointments, built with TypeScript and Prisma.
+
+## Prerequisites
+
+- Node.js 18.x or higher
+- Docker and Docker Compose
+- npm or yarn
+- PostgreSQL 16 (via Docker)
+
+## Tech Stack
+
+- **Frontend:** Next.js 15.3.1 (App Router)
+- **Backend:** Next.js API Routes
+- **Database:** PostgreSQL 16
+- **ORM:** Prisma 6.6.0
+- **Authentication:** NextAuth.js 5.0
+- **Styling:** TailwindCSS 4.x
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd medbook
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file in the root directory:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/hospital_booking"
 
-## Learn More
+# NextAuth
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Installation and Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Setup Instructions
-
-1. Install dependencies:
 ```bash
+# Install dependencies
 npm install
-```
 
-2. Start the database:
-```bash
+# Start the database
 docker-compose up -d
-```
 
-3. Run database migrations and seed:
-```bash
+# Run database migrations
 npx prisma migrate dev
-npx prisma db seed
-```
 
-4. Start the development server:
-```bash
+# Seed the database
+npx prisma db seed
+
+# Start the development server
 npm run dev
 ```
 
 The application will be available at http://localhost:3000
 
-### Demo Account
-Email: demo@example.com
-Password: password123
+## Development Guidelines
+
+### Code Style
+
+We use ESLint and Prettier for code formatting. Configuration files are included in the repository.
+
+```bash
+# Run linter
+npm run lint
+
+# Format code
+npm run format
+```
+
+### Git Workflow
+
+1. Create a feature branch:
+```bash
+git checkout -b feature/your-feature-name
+```
+
+2. Make your changes and commit using conventional commits:
+```bash
+git commit -m "feat: add booking confirmation"
+git commit -m "fix: resolve date picker issue"
+```
+
+3. Push and create a pull request:
+```bash
+git push origin feature/your-feature-name
+```
+
+### API Endpoints
+
+#### Authentication
+- `POST /api/auth/signin`: User login
+- `POST /api/auth/signup`: User registration
+
+#### Bookings
+- `GET /api/bookings`: List user's bookings
+- `POST /api/bookings`: Create new booking
+
+#### Hospitals
+- `GET /api/hospitals`: List available hospitals
+- `GET /api/hospitals/:id/services`: Get hospital services
+
+### Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages and API routes
+│   ├── api/               # API endpoints
+│   ├── auth/              # Authentication related pages
+│   ├── dashboard/         # User dashboard
+│   └── hospitals/         # Hospital booking interface
+├── components/            # Reusable React components
+├── lib/                   # Shared utilities and configurations
+│   ├── prisma.ts         # Prisma client instance
+│   └── validations/      # Zod schemas for validation
+└── types/                # TypeScript type definitions
+```
+
+### Database Schema
+
+Key entities and their relationships:
+- `Hospital`: Medical facilities
+- `Service`: Medical services offered by hospitals
+- `Booking`: Appointment bookings
+- `User`: System users (patients)
+
+
+## Demo Account
+
+For testing purposes, use:
+- Email: demo@example.com
+- Password: password123
+
+## Docker Commands
+
+```bash
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Reset database
+docker-compose down -v
+docker-compose up -d
+```
+
+## Common Issues
+
+1. **Database Connection Issues**
+   - Ensure Docker is running
+   - Check if PostgreSQL container is healthy
+   - Verify DATABASE_URL in .env
+
+2. **Authentication Errors**
+   - Confirm NEXTAUTH_SECRET is set
+   - Verify NEXTAUTH_URL matches your development URL
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
