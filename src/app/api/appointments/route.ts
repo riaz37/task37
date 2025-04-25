@@ -2,6 +2,84 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
+/**
+ * @swagger
+ * /api/appointments:
+ *   get:
+ *     summary: Get user appointments
+ *     description: Retrieves all appointments for the authenticated user
+ *     tags: [Appointments]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of appointments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Booking'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ * 
+ *   post:
+ *     summary: Create new appointment
+ *     description: Creates a new appointment booking
+ *     tags: [Appointments]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - hospitalId
+ *               - serviceId
+ *               - timeSlot
+ *             properties:
+ *               hospitalId:
+ *                 type: string
+ *               serviceId:
+ *                 type: string
+ *               timeSlot:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *           example:
+ *             hospitalId: "clh2x0f4b0001qw3j1234567"
+ *             serviceId: "clh2x0f4b0002qw3j1234567"
+ *             timeSlot:
+ *               id: "clh2x0f4b0003qw3j1234567"
+ *     responses:
+ *       200:
+ *         description: Appointment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Booking'
+ *             example:
+ *               id: "clh2x0f4b0004qw3j1234567"
+ *               hospitalId: "clh2x0f4b0001qw3j1234567"
+ *               serviceId: "clh2x0f4b0002qw3j1234567"
+ *               timeSlotId: "clh2x0f4b0003qw3j1234567"
+ *               userId: "clh2x0f4b0000qw3j1234567"
+ *               status: "confirmed"
+ *               createdAt: "2024-01-20T10:30:00Z"
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Hospital or service not found
+ *       500:
+ *         description: Internal server error
+ */
 export async function GET() {
   try {
     const session = await auth();

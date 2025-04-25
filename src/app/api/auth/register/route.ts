@@ -1,7 +1,60 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-import { hash } from 'bcryptjs'
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { hash } from 'bcryptjs';
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register new user
+ *     description: Creates a new user account
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *           example:
+ *             email: "user@example.com"
+ *             password: "securepass123"
+ *     responses:
+ *       200:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *             example:
+ *               message: "User created successfully"
+ *               user:
+ *                 id: "clh2x0f4b0000qw3j1234567"
+ *                 email: "user@example.com"
+ *       400:
+ *         description: Invalid request or user already exists
+ *       500:
+ *         description: Internal server error
+ */
 const prisma = new PrismaClient()
 
 export async function POST(request: Request) {
