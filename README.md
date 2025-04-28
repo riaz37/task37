@@ -62,6 +62,42 @@ npm run dev
 
 The application will be available at http://localhost:3000
 
+### 4. Database Seeding
+
+The seed script (`prisma/seed.ts`) creates initial data including:
+
+- Demo user account:
+  - Email: demo@example.com
+  - Password: password123
+
+- Three hospitals:
+  - General Hospital
+  - City Medical Center
+  - Community Hospital
+
+- Services for each hospital:
+  - General Check-up (30 min, $100)
+  - Blood Test (15 min, $75)
+  - X-Ray (20 min, $150)
+
+- Time slots:
+  - Generated for the next 7 days
+  - Available from 9 AM to 5 PM
+  - 70% chance of being available
+
+- Sample bookings:
+  - Creates 3 confirmed bookings for the demo user
+
+To reseed the database:
+
+```bash
+# Drop all tables and reseed
+npx prisma migrate reset
+
+# Keep tables but clear and reseed data
+npx prisma db seed
+```
+
 ## Development Guidelines
 
 ### Code Style
