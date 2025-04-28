@@ -1,10 +1,8 @@
 import NextAuth from "next-auth";
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";  // Use the singleton prisma client
 import { compare } from "bcryptjs";
-
-const prisma = new PrismaClient();
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -20,17 +18,14 @@ export const authConfig: NextAuthConfig = {
 
         try {
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email } as { email: string },
+            where: { email: credentials.email },
           });
 
-          if (!user) {
+          if (!user || !user.password) {
             return null;
           }
 
-          const passwordMatch = await compare(
-            credentials.password as string,
-            user.password as string
-          );
+          const passwordMatch = await compare(credentials.password, user.password);
 
           if (!passwordMatch) {
             return null;
@@ -43,8 +38,6 @@ export const authConfig: NextAuthConfig = {
         } catch (error) {
           console.error("Auth error:", error);
           return null;
-        } finally {
-          await prisma.$disconnect();
         }
       },
     }),
@@ -68,9 +61,8 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
-  session: {
-    strategy: "jwt",
-  },
+  trustHost: true,
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export const { auth, signIn, signOut, handlers } = NextAuth(authConfig);
