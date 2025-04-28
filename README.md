@@ -16,6 +16,7 @@ A Next.js application for booking medical appointments, built with TypeScript an
 - **Database:** PostgreSQL 16
 - **ORM:** Prisma 6.6.0
 - **Authentication:** NextAuth.js 5.0
+- **API Documentation:** Swagger/OpenAPI
 - **Styling:** TailwindCSS 4.x
 
 ## Getting Started
@@ -92,6 +93,31 @@ git commit -m "fix: resolve date picker issue"
 ```bash
 git push origin feature/your-feature-name
 ```
+
+### API Documentation
+
+The API documentation is available at http://localhost:3000/api-docs when running in development mode. It provides:
+
+- Interactive API testing interface
+- Detailed request/response schemas
+- Authentication requirements
+- Example requests and responses
+
+To update the API documentation:
+
+1. Add JSDoc comments to your API routes:
+```typescript
+/**
+ * @swagger
+ * /api/your-endpoint:
+ *   get:
+ *     summary: Your endpoint description
+ *     ...
+ */
+```
+
+2. Update schema definitions in `src/lib/swagger.ts` if needed
+3. Restart the development server to see changes
 
 ### API Endpoints
 

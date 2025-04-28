@@ -14,6 +14,13 @@
   - Reduces complexity of managing separate services
   - Built-in API route handlers with improved performance
 
+### API Documentation
+- **Swagger/OpenAPI**
+  - Interactive API documentation using `next-swagger-doc` and `swagger-ui-react`
+  - Auto-generated documentation from JSDoc comments
+  - Available at `/api-docs` endpoint
+  - Supports testing API endpoints directly from the UI
+
 ### Database
 - **PostgreSQL 16**
   - Robust relational database with excellent support for complex queries
@@ -59,6 +66,14 @@ src/
 
 ## API Structure
 
+### Documentation
+- Interactive API documentation available at `/api-docs`
+- Swagger UI provides:
+  - Endpoint descriptions and parameters
+  - Request/response schemas
+  - Authentication requirements
+  - Interactive testing interface
+
 ### Authentication Endpoints
 - `POST /api/auth/signin`: User login
 - `POST /api/auth/signup`: User registration
@@ -70,6 +85,7 @@ src/
 ### Hospital Endpoints
 - `GET /api/hospitals`: List available hospitals
 - `GET /api/hospitals/:id/services`: Get hospital services
+- `GET /api/hospitals/:id/services/:serviceId/time-slots`: Get available time slots
 
 ## Key Design Decisions
 

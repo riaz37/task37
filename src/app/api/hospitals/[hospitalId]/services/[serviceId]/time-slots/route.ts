@@ -48,10 +48,9 @@ import { addDays, startOfDay, endOfDay } from "date-fns";
  *       500:
  *         description: Server error
  */
-export async function GET(
-  request: Request,
-  { params }: { params: { hospitalId: string; serviceId: string } }
-) {
+
+type Params = Promise<{ hospitalId: string; serviceId: string }>;
+export async function GET(request: Request, { params }: { params: Params }) {
   const { hospitalId, serviceId } = await params;
 
   try {

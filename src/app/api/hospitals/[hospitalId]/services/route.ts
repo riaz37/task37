@@ -30,10 +30,8 @@ import { prisma } from "@/lib/prisma";
  *       500:
  *         description: Server error
  */
-export async function GET(
-  request: Request,
-  { params }: { params: { hospitalId: string } }
-) {
+type Params = Promise<{ hospitalId: string }>;
+export async function GET(request: Request, { params }: { params: Params }) {
   const { hospitalId } = await params;
 
   try {
