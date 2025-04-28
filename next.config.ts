@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   webpack: (config, { isServer }) => {
+    config.cache = false;
     if (isServer) {
       config.externals = [...(config.externals || []), "bcryptjs"];
     }
