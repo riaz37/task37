@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Hospital, Service, TimeSlot } from '@/types/hospital';
 import HospitalList from './components/HospitalList';
 import ServiceSelection from './components/ServiceSelection';
-import BookingForm from '@/app/hospitals/components/BookingForm';
+import BookingForm from './components/BookingForm';
 
 export default function HospitalsPage() {
   const router = useRouter();

@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
+import { registerSchema } from '@/lib/validations/auth.schema';
+import { ZodError } from 'zod';
+
+const prisma = new PrismaClient();
 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Register new user
- *     description: Creates a new user account
+ *     summary: Register a new user
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -18,19 +21,24 @@ import { hash } from 'bcryptjs';
  *             required:
  *               - email
  *               - password
+ *               - confirmPassword
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: User's email address
  *               password:
  *                 type: string
+ *                 format: password
  *                 minLength: 8
- *           example:
- *             email: "user@example.com"
- *             password: "securepass123"
+ *                 description: User's password (min 8 chars, must contain uppercase, lowercase, and number)
+ *               confirmPassword:
+ *                 type: string
+ *                 format: password
+ *                 description: Password confirmation
  *     responses:
- *       200:
- *         description: User created successfully
+ *       201:
+ *         description: User successfully registered
  *         content:
  *           application/json:
  *             schema:
@@ -38,6 +46,7 @@ import { hash } from 'bcryptjs';
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: User created successfully
  *                 user:
  *                   type: object
  *                   properties:
@@ -45,63 +54,55 @@ import { hash } from 'bcryptjs';
  *                       type: string
  *                     email:
  *                       type: string
- *             example:
- *               message: "User created successfully"
- *               user:
- *                 id: "clh2x0f4b0000qw3j1234567"
- *                 email: "user@example.com"
  *       400:
- *         description: Invalid request or user already exists
+ *         description: Validation error or user already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 details:
+ *                   type: array
+ *                   items:
+ *                     type: object
  *       500:
- *         description: Internal server error
+ *         description: Server error
  */
-const prisma = new PrismaClient()
-
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json()
-
-    // Validate input
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
-    }
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json();
+    
+    // Validate input using Zod schema
+    const validatedData = registerSchema.parse(body);
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
+      where: { email: validatedData.email },
+    });
 
     if (existingUser) {
       return NextResponse.json(
         { error: 'User already exists' },
         { status: 400 }
-      )
+      );
     }
 
     // Hash password
-    const hashedPassword = await hash(password, 12)
+    const hashedPassword = await hash(validatedData.password, 12);
 
     // Create user
     const user = await prisma.user.create({
       data: {
-        email,
+        email: validatedData.email,
         password: hashedPassword,
       },
       select: {
         id: true,
         email: true,
       },
-    })
+    });
 
     return NextResponse.json({
       message: 'User created successfully',
@@ -109,14 +110,24 @@ export async function POST(request: Request) {
         id: user.id,
         email: user.email,
       },
-    })
+    });
   } catch (error) {
-    console.error('Registration error:', error)
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { 
+          error: 'Validation failed',
+          details: error.errors 
+        },
+        { status: 400 }
+      );
+    }
+
+    console.error('Registration error:', error);
     return NextResponse.json(
       { error: 'Registration failed' },
       { status: 500 }
-    )
+    );
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }

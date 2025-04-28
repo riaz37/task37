@@ -27,7 +27,7 @@ import { auth } from '@/auth';
  * 
  *   post:
  *     summary: Create new appointment
- *     description: Creates a new appointment booking
+ *     description: Creates a new appointment booking with transaction-based time slot locking
  *     tags: [Appointments]
  *     security:
  *       - BearerAuth: []
@@ -44,18 +44,18 @@ import { auth } from '@/auth';
  *             properties:
  *               hospitalId:
  *                 type: string
+ *                 description: ID of the hospital
  *               serviceId:
  *                 type: string
+ *                 description: ID of the service
  *               timeSlot:
  *                 type: object
+ *                 required:
+ *                   - id
  *                 properties:
  *                   id:
  *                     type: string
- *           example:
- *             hospitalId: "clh2x0f4b0001qw3j1234567"
- *             serviceId: "clh2x0f4b0002qw3j1234567"
- *             timeSlot:
- *               id: "clh2x0f4b0003qw3j1234567"
+ *                     description: ID of the time slot
  *     responses:
  *       200:
  *         description: Appointment created successfully
@@ -63,20 +63,14 @@ import { auth } from '@/auth';
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Booking'
- *             example:
- *               id: "clh2x0f4b0004qw3j1234567"
- *               hospitalId: "clh2x0f4b0001qw3j1234567"
- *               serviceId: "clh2x0f4b0002qw3j1234567"
- *               timeSlotId: "clh2x0f4b0003qw3j1234567"
- *               userId: "clh2x0f4b0000qw3j1234567"
- *               status: "confirmed"
- *               createdAt: "2024-01-20T10:30:00Z"
  *       400:
- *         description: Invalid request
+ *         description: Invalid request or missing fields
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Hospital or service not found
+ *         description: Hospital, service, or time slot not found
+ *       409:
+ *         description: Time slot no longer available
  *       500:
  *         description: Internal server error
  */
@@ -129,77 +123,89 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate hospital exists
-    const hospital = await prisma.hospital.findUnique({
-      where: { id: body.hospitalId },
-    });
-
-    if (!hospital) {
-      return NextResponse.json(
-        { error: 'Hospital not found' },
-        { status: 404 }
-      );
-    }
-
-    // Validate service exists and belongs to the hospital
-    const service = await prisma.service.findFirst({
-      where: {
-        id: body.serviceId,
-        hospitalId: body.hospitalId,
-      },
-    });
-
-    if (!service) {
-      return NextResponse.json(
-        { error: 'Service not found or does not belong to the hospital' },
-        { status: 404 }
-      );
-    }
-
-    // Create appointment using a transaction
+    // Create appointment using a transaction with increased timeout
     const appointment = await prisma.$transaction(async (tx) => {
-      // Check if time slot is still available
+      // Check if time slot is still available and lock it
       const timeSlot = await tx.timeSlot.findUnique({
         where: { 
           id: body.timeSlot.id,
+        },
+        select: {
+          id: true,
           available: true,
-        },
-      });
-
-      if (!timeSlot) {
-        throw new Error('Time slot not available');
-      }
-
-      // Create the appointment
-      const newAppointment = await tx.booking.create({
-        data: {
-          hospitalId: body.hospitalId,
-          serviceId: body.serviceId,
-          timeSlotId: body.timeSlot.id,
-          userId: session.user?.id ?? '',
-          status: 'confirmed'
-        },
-        include: {
-          hospital: true,
-          service: true,
-          timeSlot: true
         }
       });
 
-      // Update time slot availability
-      await tx.timeSlot.update({
-        where: { id: body.timeSlot.id },
-        data: { available: false }
-      });
+      if (!timeSlot || !timeSlot.available) {
+        throw new Error('Time slot not available');
+      }
+
+      // Validate hospital and service in parallel
+      const [hospital, service] = await Promise.all([
+        tx.hospital.findUnique({
+          where: { id: body.hospitalId },
+          select: { id: true }
+        }),
+        tx.service.findFirst({
+          where: {
+            id: body.serviceId,
+            hospitalId: body.hospitalId,
+          },
+          select: { id: true }
+        })
+      ]);
+
+      if (!hospital) {
+        throw new Error('Hospital not found');
+      }
+
+      if (!service) {
+        throw new Error('Service not found or does not belong to the hospital');
+      }
+
+      // Create the appointment and update time slot in parallel
+      const [newAppointment] = await Promise.all([
+        tx.booking.create({
+          data: {
+            hospitalId: body.hospitalId,
+            serviceId: body.serviceId,
+            timeSlotId: body.timeSlot.id,
+            userId: session.user?.id ?? '',
+            status: 'confirmed'
+          },
+          include: {
+            hospital: true,
+            service: true,
+            timeSlot: true
+          }
+        }),
+        tx.timeSlot.update({
+          where: { id: body.timeSlot.id },
+          data: { available: false }
+        })
+      ]);
 
       return newAppointment;
+    }, {
+      timeout: 10000, // Increase timeout to 10 seconds
+      isolationLevel: 'Serializable' // Ensure data consistency
     });
 
     return NextResponse.json(appointment);
   } catch (error) {
     console.error('Error creating appointment:', error);
+    
+    // Improved error handling
+    if (error instanceof Error) {
+      const status = error.message.includes('not found') ? 404 : 
+                    error.message.includes('not available') ? 409 : 
+                    500;
+      
+      return NextResponse.json({ error: error.message }, { status });
+    }
+    
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create appointment' },
+      { error: 'Failed to create appointment' },
       { status: 500 }
     );
   }

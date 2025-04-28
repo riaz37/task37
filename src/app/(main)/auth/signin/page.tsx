@@ -5,21 +5,30 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { signInSchema, type SignInInput } from "@/lib/validations/auth.schema";
+import { ZodError } from "zod";
 
 export default function SignIn() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState<SignInInput>({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
+
     try {
+      // Validate form data
+      signInSchema.parse(formData);
+
       const result = await signIn("credentials", {
-        email,
-        password,
+        email: formData.email,
+        password: formData.password,
         redirect: false,
       });
 
@@ -30,9 +39,13 @@ export default function SignIn() {
         router.refresh();
       }
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
-      );
+      if (error instanceof ZodError) {
+        setError(error.errors[0].message);
+      } else {
+        setError(
+          error instanceof Error ? error.message : "An unexpected error occurred"
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -119,8 +132,8 @@ export default function SignIn() {
               </label>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 bg-background text-foreground"
                 placeholder="Enter your email"
                 required
@@ -133,8 +146,8 @@ export default function SignIn() {
               </label>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 bg-background text-foreground"
                 placeholder="Enter your password"
                 required

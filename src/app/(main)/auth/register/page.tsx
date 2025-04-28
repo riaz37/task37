@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { registerSchema, type RegisterInput } from "@/lib/validations/auth.schema";
+import { ZodError } from "zod";
 
 export default function Register() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterInput>({
     email: "",
     password: "",
     confirmPassword: "",
@@ -20,22 +22,16 @@ export default function Register() {
     setError("");
     setLoading(true);
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
     try {
+      // Validate form data
+      registerSchema.parse(formData);
+
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -46,7 +42,13 @@ export default function Register() {
 
       router.push("/auth/signin");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Registration failed");
+      if (error instanceof ZodError) {
+        setError(error.errors[0].message);
+      } else {
+        setError(
+          error instanceof Error ? error.message : "Registration failed"
+        );
+      }
     } finally {
       setLoading(false);
     }

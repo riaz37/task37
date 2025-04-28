@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function BookingSuccessPage() {
+function BookingSuccessContent() {
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
   const formattedDate = date
@@ -57,11 +58,11 @@ export default function BookingSuccessPage() {
           <div className="pt-8 space-y-4">
             <Link
               href="/appointments"
-              className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary hover:bg-primary/90 transition-colors"
+              className="w-full inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-foreground hover:bg-gray-50 transition-colors"
             >
               View My Appointments
               <svg
-                className="ml-2 w-5 h-5"
+                className="ml-2 w-5 h-5 animate-pulse"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -95,5 +96,21 @@ export default function BookingSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-center">
+          <div className="h-24 w-24 bg-green-100 rounded-full mx-auto mb-8"></div>
+          <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <BookingSuccessContent />
+    </Suspense>
   );
 }
