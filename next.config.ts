@@ -10,12 +10,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...(config.externals || []), "bcryptjs"];
-    }
-    return config;
-  },
+
   poweredByHeader: false,
   generateEtags: false,
 };
