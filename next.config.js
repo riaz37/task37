@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  distDir: ".next",
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Explicitly set output to export
+  distDir: '.next',
   experimental: {
     serverActions: {
       bodySizeLimit: "2mb",
