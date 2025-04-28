@@ -3,18 +3,21 @@
 ## Tech Stack Overview
 
 ### Frontend
+
 - **Next.js 15.3.1** (App Router)
   - Chosen for its server-side rendering capabilities, built-in API routes, and file-based routing
   - App Router provides better performance and more intuitive routing compared to Pages Router
   - Built-in TypeScript support and optimized build system
 
 ### Backend
+
 - **Next.js API Routes**
   - Unified frontend and backend deployment
   - Reduces complexity of managing separate services
   - Built-in API route handlers with improved performance
 
 ### API Documentation
+
 - **Swagger/OpenAPI**
   - Interactive API documentation using `next-swagger-doc` and `swagger-ui-react`
   - Auto-generated documentation from JSDoc comments
@@ -22,12 +25,14 @@
   - Supports testing API endpoints directly from the UI
 
 ### Database
+
 - **PostgreSQL 16**
   - Robust relational database with excellent support for complex queries
   - Strong data integrity through ACID compliance
   - Excellent performance for read-heavy operations common in booking systems
 
 ### ORM
+
 - **Prisma 6.6.0**
   - Type-safe database queries
   - Automatic migrations and schema management
@@ -35,6 +40,7 @@
   - Built-in connection pooling
 
 ### Authentication
+
 - **NextAuth.js 5.0**
   - Built specifically for Next.js
   - JWT-based authentication
@@ -80,6 +86,7 @@ config/
 ## Database Schema
 
 ### Key Entities
+
 - `Hospital`: Medical facilities offering services
 - `Service`: Medical services offered by hospitals
 - `Booking`: Appointment bookings linking users and services
@@ -88,6 +95,7 @@ config/
 ## API Structure
 
 ### Documentation
+
 - Interactive API documentation available at `/api-docs`
 - Swagger UI provides:
   - Endpoint descriptions and parameters
@@ -96,14 +104,22 @@ config/
   - Interactive testing interface
 
 ### Authentication Endpoints
+
 - `POST /api/auth/signin`: User login
 - `POST /api/auth/signup`: User registration
 
+### Appointment Endpoints
+
+- `GET /api/appointments`: Get user's appointments
+- `POST /api/appointments`: Create new appointment
+
 ### Booking Endpoints
+
 - `GET /api/bookings`: List user's bookings
 - `POST /api/bookings`: Create new booking
 
 ### Hospital Endpoints
+
 - `GET /api/hospitals`: List available hospitals
 - `GET /api/hospitals/:id/services`: Get hospital services
 - `GET /api/hospitals/:id/services/:serviceId/time-slots`: Get available time slots
@@ -111,39 +127,46 @@ config/
 ## Key Design Decisions
 
 ### 1. Monolithic Architecture
-- **Reason**: 
+
+- **Reason**:
   - Faster development and simpler deployment
   - Easier to maintain for small to medium scale
   - Lower operational complexity
 
 ### 2. Data Validation
+
 - Using Zod for runtime type checking
 - Validation occurs at API boundaries
 - Consistent error handling across the application
 
 ### 3. Authentication Strategy
+
 - JWT-based authentication
 - Session handling via HTTP-only cookies
 
 ## Development Practices
 
 ### Code Quality
+
 - ESLint for code linting
 - Prettier for code formatting
 - Husky for pre-commit hooks
 - TypeScript for type safety
 
 ## Deployment
+
 - Next.js provides optimized production builds
 - Vercel for hosting and deployment
 - Environment variables managed via `.env` files
 
 ### Docker Configuration
+
 - PostgreSQL runs in Docker container
 - Environment variables managed via docker-compose
 - Volume mounting for data persistence
 
 ### Development Setup
+
 ```bash
 # Install dependencies
 npm install
@@ -164,10 +187,12 @@ npm run dev
 ## Security Measures
 
 1. **API Security**
+
    - Input validation
    - SQL injection prevention via Prisma
 
 2. **Authentication**
+
    - Password hashing with bcrypt
    - Protected API routes
 
