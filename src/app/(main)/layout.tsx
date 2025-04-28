@@ -1,4 +1,4 @@
-import { SessionProvider } from "@/components/providers/SessionProvider";
+import { SessionProvider } from "@/app/(main)/providers/SessionProvider";
 import "./globals.css";
 import type { Metadata } from "next";
 
