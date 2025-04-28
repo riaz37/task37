@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { addDays, startOfDay, endOfDay } from "date-fns";
+import { Params } from "@/types/params";
 
 /**
  * @swagger
@@ -49,8 +50,10 @@ import { addDays, startOfDay, endOfDay } from "date-fns";
  *         description: Server error
  */
 
-type Params = Promise<{ hospitalId: string; serviceId: string }>;
-export async function GET(request: Request, { params }: { params: Params }) {
+export async function GET(
+  _request: Request,
+  { params }: { params: Params<{ hospitalId: string; serviceId: string }> }
+) {
   const { hospitalId, serviceId } = await params;
 
   try {

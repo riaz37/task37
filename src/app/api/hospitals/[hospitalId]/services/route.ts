@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Params } from "@/types/params";
 
 /**
  * @swagger
@@ -30,8 +31,8 @@ import { prisma } from "@/lib/prisma";
  *       500:
  *         description: Server error
  */
-type Params = Promise<{ hospitalId: string }>;
-export async function GET(request: Request, { params }: { params: Params }) {
+
+export async function GET(_request: Request, { params }: { params: Params<{ hospitalId: string }> }) {
   const { hospitalId } = await params;
 
   try {
