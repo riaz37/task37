@@ -105,8 +105,8 @@ config/
 
 ### Authentication Endpoints
 
-- `POST /api/auth/signin`: User login
-- `POST /api/auth/signup`: User registration
+- `POST /api/auth/[...nextauth]`: Authentication handler
+- `POST /api/auth/register`: User registration
 
 ### Appointment Endpoints
 

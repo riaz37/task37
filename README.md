@@ -158,16 +158,17 @@ To update the API documentation:
 ### API Endpoints
 
 #### Authentication
-- `POST /api/auth/signin`: User login
-- `POST /api/auth/signup`: User registration
+- `POST /api/auth/[...nextauth]`: User authentication (signin/signout)
+- `POST /api/auth/register`: User registration
 
-#### Bookings
-- `GET /api/bookings`: List user's bookings
-- `POST /api/bookings`: Create new booking
+#### Appointments
+- `GET /api/appointments`: List user's appointments
+- `POST /api/appointments`: Create new appointment
 
 #### Hospitals
 - `GET /api/hospitals`: List available hospitals
 - `GET /api/hospitals/:id/services`: Get hospital services
+- `GET /api/hospitals/:id/services/:serviceId/time-slots`: Get available time slots
 
 ### Project Structure
 
