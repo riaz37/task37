@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   experimental: {
     serverActions: {
       bodySizeLimit: "2mb",
@@ -9,6 +8,12 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = [...(config.externals || []), "bcryptjs"];
+    }
+    return config;
   },
 };
 
