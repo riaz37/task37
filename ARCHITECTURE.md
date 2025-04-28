@@ -45,15 +45,36 @@
 ```text
 src/
 ├── app/                    # Next.js App Router pages and API routes
+│   ├── (main)/            # Main layout group
+│   │   ├── layout.tsx     # Root layout with SessionProvider
+│   │   └── page.tsx       # Home page
+│   ├── (swagger)/         # Swagger documentation group
+│   │   ├── api-docs/      # API documentation pages
+│   │   │   ├── layout.tsx # Swagger UI layout
+│   │   │   └── page.tsx   # Swagger UI page
 │   ├── api/               # API endpoints
-│   ├── auth/              # Authentication related pages
-│   ├── dashboard/         # User dashboard
-│   └── hospitals/         # Hospital booking interface
+│   │   ├── auth/          # Authentication endpoints
+│   │   │   ├── register/  # User registration
+│   │   │   └── [...]/     # Other auth endpoints
+│   │   └── docs/          # Swagger documentation endpoint
 ├── components/            # Reusable React components
 ├── lib/                   # Shared utilities and configurations
 │   ├── prisma.ts         # Prisma client instance
+│   ├── swagger.ts        # Swagger configuration
 │   └── validations/      # Zod schemas for validation
-└── types/                # TypeScript type definitions
+├── middleware.ts         # Next.js middleware (auth protection)
+└── types/               # TypeScript type definitions
+    └── swagger.d.ts     # Swagger type definitions
+
+prisma/
+├── schema.prisma        # Database schema
+└── seed.ts             # Database seeding script
+
+public/                 # Static assets
+└── medical-logo.svg    # Site logo
+
+config/
+└── next.config.ts      # Next.js configuration
 ```
 
 ## Database Schema
@@ -90,8 +111,7 @@ src/
 ## Key Design Decisions
 
 ### 1. Monolithic Architecture
-- **Decision**: Chose monolithic over microservices
-- **Rationale**: 
+- **Reason**: 
   - Faster development and simpler deployment
   - Easier to maintain for small to medium scale
   - Lower operational complexity
@@ -114,6 +134,9 @@ src/
 - TypeScript for type safety
 
 ## Deployment
+- Next.js provides optimized production builds
+- Vercel for hosting and deployment
+- Environment variables managed via `.env` files
 
 ### Docker Configuration
 - PostgreSQL runs in Docker container
