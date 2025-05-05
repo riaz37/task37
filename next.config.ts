@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
+    webpackBuildWorker: true,
   },
   typescript: {
     ignoreBuildErrors: true,
