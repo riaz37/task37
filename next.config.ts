@@ -6,15 +6,19 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    webpackBuildWorker: true,
-    webpackMemoryOptimizations: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-
+  // Disable unnecessary features
   poweredByHeader: false,
   generateEtags: false,
+  // Completely disable webpack cache
+  webpack: (config) => {
+    // Disable webpack cache entirely
+    config.cache = false;
+    return config;
+  },
 };
 
 module.exports = nextConfig;
