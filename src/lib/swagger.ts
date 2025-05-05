@@ -91,6 +91,12 @@ export const getApiDocs = () => {
           },
         },
       },
+      // Apply BearerAuth security globally (can be overridden in individual routes)
+      security: [
+        {
+          BearerAuth: [],
+        },
+      ],
     },
   });
   return spec;

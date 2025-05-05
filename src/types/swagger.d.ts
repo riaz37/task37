@@ -13,6 +13,7 @@ declare module 'swagger-ui-react' {
     maxDisplayedTags?: number;
     showExtensions?: boolean;
     showCommonExtensions?: boolean;
+    persistAuthorization?: boolean;
   }
 
   const SwaggerUI: ComponentType<SwaggerUIProps>;
