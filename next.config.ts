@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "2mb",
     },
     webpackBuildWorker: true,
+    webpackMemoryOptimizations: true,
   },
   typescript: {
     ignoreBuildErrors: true,
